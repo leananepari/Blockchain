@@ -79,21 +79,21 @@ class Blockchain(object):
     #     while self.valid_proof(block_string, proof) is False:
     #         proof += 1
     #     return proof
-    # @staticmethod
-    # def valid_proof(block_string, proof):
-    #     """
-    #     Validates the Proof:  Does hash(block_string, proof) contain 6
-    #     leading zeroes?  Return true if the proof is valid
-    #     :param block_string: <string> The stringified block to use to
-    #     check in combination with `proof`
-    #     :param proof: <int?> The value that when combined with the
-    #     stringified previous block results in a hash that has the
-    #     correct number of leading zeroes.
-    #     :return: True if the resulting hash is a valid proof, False otherwise
-    #     """
-    #     guess = f"{block_string}{proof}".encode()
-    #     guess_hash = hashlib.sha256(guess).hexdigest()
-    #     return guess_hash[:3] == "000000"
+    @staticmethod
+    def valid_proof(block_string, proof):
+        """
+        Validates the Proof:  Does hash(block_string, proof) contain 6
+        leading zeroes?  Return true if the proof is valid
+        :param block_string: <string> The stringified block to use to
+        check in combination with `proof`
+        :param proof: <int?> The value that when combined with the
+        stringified previous block results in a hash that has the
+        correct number of leading zeroes.
+        :return: True if the resulting hash is a valid proof, False otherwise
+        """
+        guess = f"{block_string}{proof}".encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        return guess_hash[:6] == "000000"
 
 # Instantiate our Node
 app = Flask(__name__)
@@ -110,9 +110,11 @@ def mine():
       }
       return jsonify(response), 400
     else:
-      if blockchain.last_block.index == data.index:
+      block_string = json.dumps(blockchain.last_block, sort_keys=True)
+      valid = blockchain.valid_proof(block_string, data['proof'])
+      if valid:
         previous_hash = blockchain.hash(blockchain.last_block)
-        block = blockchain.new_block(data.proof, previous_hash)
+        block = blockchain.new_block(data['proof'], previous_hash)
         response = {
           'message': 'New Block Forged'
         }

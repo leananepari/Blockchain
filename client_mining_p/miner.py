@@ -13,9 +13,9 @@ def proof_of_work(block):
     in an effort to find a number that is a valid proof
     :return: A valid proof for the provided block
     """
-    block_string = json.dumps(block)
+    block_string = json.dumps(block, sort_keys=True )
     proof = 0
-    while self.valid_proof(block_string, proof) is False:
+    while valid_proof(block_string, proof) is False:
         proof += 1
     return proof
 
@@ -64,10 +64,11 @@ if __name__ == '__main__':
             break
 
         # TODO: Get the block from `data` and use it to look for a new proof
-        new_proof = proof_of_work(data.last_block)
+        new_proof = proof_of_work(data['last_block'])
+        print('PRINT', data['last_block'])
 
         # When found, POST it to the server {"proof": new_proof, "id": id}
-        post_data = {"proof": new_proof, "id": id, "index": data.index}
+        post_data = {"proof": new_proof, "id": id}
 
         r = requests.post(url=node + "/mine", json=post_data)
         data = r.json()
@@ -77,7 +78,7 @@ if __name__ == '__main__':
         # print the message from the server.
         if data.message == 'New Block Forged':
           coins += 1
-          print('Coins mined': coins)
+          print('Coins mined: ', coins)
         else:
           print(data.message)
           

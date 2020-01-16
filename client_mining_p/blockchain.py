@@ -104,7 +104,7 @@ blockchain = Blockchain()
 @app.route('/mine', methods=['POST'])
 def mine():
     data = request.get_json()
-    if data.proof is None or data.id is None:
+    if data['proof'] is None or data['id'] is None:
       response = {
         'message': 'Proof or id is missing.'
       }

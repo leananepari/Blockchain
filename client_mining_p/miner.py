@@ -7,6 +7,7 @@ import json
 import time
 
 
+
 def proof_of_work(block):
     """
     Simple Proof of Work Algorithm
@@ -48,7 +49,7 @@ if __name__ == '__main__':
         node = "http://localhost:5000"
 
     # Load ID
-    f = open("my_id.txt", "r")
+    f = open("my_id.txt", encoding='utf-8-sig')
     id = f.read()
     print("ID is", id)
     f.close()

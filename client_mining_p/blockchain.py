@@ -150,6 +150,11 @@ import json
 from time import time
 from uuid import uuid4
 from flask import Flask, jsonify, request
+
+from flask_cors import CORS, cross_origin
+
+
+
 class Blockchain(object):
     def __init__(self):
         self.chain = []
@@ -302,6 +307,7 @@ def mine():
         }
     return jsonify(response), 200
 @app.route('/chain', methods=['GET'])
+@cross_origin(supports_credentials=True)
 def full_chain():
     response = {
         # TODO: Return the chain and its current length
@@ -315,6 +321,23 @@ def last_block():
         'last_block': blockchain.last_block
     }
     return jsonify(response), 200
+
+@app.route('/update', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def update():
+  data = request.get_json()
+
+  for i in blockchain.chain:
+    for j in i['transactions']:
+      if j['recipient'] == data['name']:
+        j['recipient'] = data['newName']
+      if j['sender'] == data['name']:
+        j['sender'] = data['newName']
+  response = {
+    'message': 'Success'
+  }
+  return jsonify(response), 200
 # Run the program on port 5000
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    CORS(app.run(host='0.0.0.0', port=5000, debug=True), support_credentials=True)
+    
